@@ -1,22 +1,15 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/env";
 
 export function isSupabaseConfigured() {
-  return Boolean(supabaseUrl && supabaseAnonKey);
+  return Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
 }
 
 export async function createClient() {
-  if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error(
-      "Supabase is not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY."
-    );
-  }
   const cookieStore = await cookies();
 
-  return createServerClient(supabaseUrl, supabaseAnonKey, {
+  return createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     cookies: {
       getAll() {
         return cookieStore.getAll();
