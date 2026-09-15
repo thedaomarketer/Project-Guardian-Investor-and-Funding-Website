@@ -3,6 +3,7 @@
 import { headers } from "next/headers";
 import { earlyAccessSchema } from "@/lib/validation/contact";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { getClientIp } from "@/lib/get-client-ip";
 
 export type EarlyAccessState = {
   status: "idle" | "success" | "error";
@@ -51,6 +52,7 @@ export async function submitEarlyAccess(
   try {
     const supabase = await createClient();
     const userAgent = (await headers()).get("user-agent") ?? undefined;
+    const ipAddress = await getClientIp();
 
     const { error } = await supabase.from("early_access_signups").insert({
       email: parsed.data.email,
@@ -65,6 +67,7 @@ export async function submitEarlyAccess(
       interest_area: parsed.data.interestArea || null,
       consent: parsed.data.consent,
       user_agent: userAgent,
+      ip_address: ipAddress,
     });
 
     if (error) {
@@ -73,6 +76,12 @@ export async function submitEarlyAccess(
           status: "error",
           message: "That email is already on the waitlist.",
           fieldErrors: { email: "Already on the waitlist" },
+        };
+      }
+      if (error.message?.includes("rate_limited")) {
+        return {
+          status: "error",
+          message: "Too many submissions from this network recently. Please try again later.",
         };
       }
       console.error("submitEarlyAccess insert error", error);

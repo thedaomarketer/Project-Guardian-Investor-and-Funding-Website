@@ -3,6 +3,7 @@
 import { headers } from "next/headers";
 import { contactFormSchema } from "@/lib/validation/contact";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { getClientIp } from "@/lib/get-client-ip";
 
 export type ContactFormState = {
   status: "idle" | "success" | "error";
@@ -53,6 +54,7 @@ export async function submitContactInquiry(
   try {
     const supabase = await createClient();
     const userAgent = (await headers()).get("user-agent") ?? undefined;
+    const ipAddress = await getClientIp();
 
     const { error } = await supabase.from("contact_inquiries").insert({
       inquiry_type: parsed.data.inquiryType,
@@ -66,9 +68,16 @@ export async function submitContactInquiry(
       phone: parsed.data.phone || null,
       consent: parsed.data.consent,
       user_agent: userAgent,
+      ip_address: ipAddress,
     });
 
     if (error) {
+      if (error.message?.includes("rate_limited")) {
+        return {
+          status: "error",
+          message: "Too many submissions from this network recently. Please try again later.",
+        };
+      }
       console.error("submitContactInquiry insert error", error);
       return {
         status: "error",
