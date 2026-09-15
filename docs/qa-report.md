@@ -1,7 +1,34 @@
 # QA Report
 
 Date: 2026-09-15 (build session). Tested against the dev server
-(`npm run dev`) and `npm run build` output on this branch.
+(`npm run dev`), `npm run build` output, and — for the sections marked
+below — the live production deployment at
+https://project-guardian-website.vercel.app.
+
+## Production deployment verification
+
+Deployed via Vercel's GitHub integration, tracking `Personal-Main`. This
+sandbox's network egress policy blocks direct requests to `*.vercel.app`
+(confirmed via `curl`: `CONNECT tunnel failed, response 403`), the same
+restriction that blocks the Supabase project host — so verification used
+`mcp__Vercel__web_fetch_vercel_url`, which fetches through Vercel's own
+infrastructure rather than this sandbox's network path.
+
+| Check | Result |
+|---|---|
+| First deploy (commit before the `src/lib/env.ts` fallback) | ❌ Build failed: `/admin` prerendering threw "Supabase is not configured" because no `NEXT_PUBLIC_SUPABASE_*` env vars exist on the Vercel project (no tool was available to set them) — full build log captured via `get_deployment_build_logs`. |
+| Fix: `src/lib/env.ts` fallback to the provisioned project's public URL/anon key | ✅ Verified locally first — `npm run build` and `npm run start` both succeed with `.env.local` entirely removed — before pushing. |
+| Redeploy after the fix | ✅ `READY`, aliased to `project-guardian-website.vercel.app` |
+| `GET /` | ✅ 200, correct title/content |
+| `GET /product` | ✅ 200, correct title ("Product Demo \| Project Guardian") |
+| `GET /contact` | ✅ 200, full page including the real Server Action form (inspected the rendered HTML directly) |
+| `GET /admin` (signed out) | ✅ Redirects to `/admin/login` (`x-matched-path: /admin/login`, page title "Admin sign in", `noindex, nofollow`) — confirms the auth gate works in production, not just locally |
+| Response headers on live requests | ✅ `Content-Security-Policy`, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy`, `Permissions-Policy`, `Strict-Transport-Security` all present exactly as configured in `next.config.ts` |
+
+**Not yet done against the live site:** an actual form submission (POST)
+and the admin sign-up → claim-admin → dashboard flow. Page rendering and
+the auth redirect are confirmed; nobody has clicked "Submit" against
+production yet. See `docs/launch-checklist.md`.
 
 ## Automated checks
 
