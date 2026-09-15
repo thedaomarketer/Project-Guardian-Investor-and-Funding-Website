@@ -29,7 +29,7 @@ export function ContactForm({ defaultType = "investor" }: { defaultType?: string
         <p className="text-sm font-medium text-[var(--success)]">{state.message}</p>
         <p className="text-sm text-muted">
           We read every inquiry. If your message needs an urgent response, please say so
-          and we'll prioritize it.
+          and we&apos;ll prioritize it.
         </p>
       </div>
     );

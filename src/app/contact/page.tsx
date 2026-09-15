@@ -23,12 +23,12 @@ export default async function ContactPage({
         <div>
           <Eyebrow>Contact</Eyebrow>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
-            Let's talk.
+            Let&apos;s talk.
           </h1>
           <p className="mt-4 max-w-md leading-relaxed text-muted">
-            Whether you're evaluating an investment, exploring a partnership, or
-            representing a school or institution, tell us a bit about what you're
-            looking for and we'll follow up directly.
+            Whether you&apos;re evaluating an investment, exploring a partnership, or
+            representing a school or institution, tell us a bit about what you&apos;re
+            looking for and we&apos;ll follow up directly.
           </p>
           <div className="mt-8 flex items-center gap-3 text-sm text-muted">
             <Mail className="h-4 w-4" aria-hidden />

@@ -63,7 +63,7 @@ export default function Home() {
             <div>
               <Eyebrow>The problem</Eyebrow>
               <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
-                Location information is most valuable when it's accurate,
+                Location information is most valuable when it&apos;s accurate,
                 current, and accessible — especially during an incident.
               </h2>
               <p className="mt-5 leading-relaxed text-muted">
@@ -215,7 +215,7 @@ export default function Home() {
             </h2>
             <p className="mt-2 max-w-xl text-white/65">
               Review the roadmap, use of funds, and risks — then reach out if
-              it's a fit.
+              it&apos;s a fit.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
